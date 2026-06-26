@@ -3,135 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Feuille de notes Cluedo — éliminez, marquez vos cartes et lancez les dés.">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cluedo Notes">
     <title>Cluedo Notes</title>
-    <style>
-        :root {
-            --bg: #1a1a1a;
-            --card: #2d2d2d;
-            --text: #e0e0e0;
-            --accent: #d32f2f;
-            --owned-bg: rgba(81, 45, 168, 0.4); 
-            --owned-text: #d1c4e9;
-            --eye-color: #4fc3f7;
-            --dice-color: #ffb300;
-            --detective-icon-color: rgba(209, 196, 233, 0.3);
-        }
-
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px 20px 120px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        h1 { color: var(--accent); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; text-align: center;}
-        .subtitle { font-size: 0.8em; opacity: 0.6; text-align: center; margin-bottom: 20px; }
-
-        .grid-container {
-            width: 100%;
-            max-width: 450px;
-            background: var(--card);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            margin-bottom: 20px;
-        }
-
-        .section-title {
-            background: #222;
-            padding: 12px 15px;
-            font-weight: bold;
-            color: var(--accent);
-            text-transform: uppercase;
-            font-size: 0.8em;
-            border-bottom: 2px solid #333;
-        }
-
-        .row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #3d3d3d;
-        }
-
-        .item-name {
-            flex-grow: 1;
-            padding: 16px 20px;
-            cursor: pointer;
-            user-select: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .action-btn {
-            padding: 16px 20px;
-            cursor: pointer;
-            border-left: 1px solid #333;
-            min-width: 30px;
-            text-align: center;
-        }
-
-        .delete-icon { color: #555; }
-        .show-icon { color: var(--eye-color); font-size: 1.2em; }
-
-        .row.owned { background: var(--owned-bg); color: var(--owned-text); font-weight: bold; }
-        .row.eliminated { display: none; }
-
-        .controls {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(26, 26, 26, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 15px 10px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            border-top: 1px solid #333;
-            z-index: 100;
-        }
-
-        button {
-            background: #333;
-            border: 1px solid #555;
-            color: #bbb;
-            padding: 12px 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.85em;
-            flex: 1;
-            max-width: 120px;
-            transition: all 0.2s;
-        }
-
-        button:hover:not(:disabled) { background: #444; color: white; }
-        button:disabled { opacity: 0.2; cursor: not-allowed; }
-        
-        #diceBtn { border-color: var(--dice-color); color: var(--dice-color); font-weight: bold; }
-        #undoBtn:not(:disabled) { border-color: var(--eye-color); color: var(--eye-color); }
-
-        #show-card-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: black;
-            z-index: 1000;
-            flex-direction: column;
-            justify-content: center; 
-            align-items: center;
-            gap: 20px;
-        }
-
-        .detective-svg { width: 150px; height: 150px; fill: var(--detective-icon-color); }
-        #show-card-overlay h2 { font-size: 3em; color: white; text-transform: uppercase; text-align: center; }
-        .hint { position: absolute; bottom: 40px; opacity: 0.4; color: white; }
-    </style>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
@@ -141,13 +22,13 @@
     <div id="app" class="grid-container"></div>
 
     <div class="controls">
-        <button id="diceBtn" onclick="rollDice()">🎲 Dés</button>
-        <button id="undoBtn" onclick="undo()" disabled>Annuler</button>
-        <button onclick="resetGame()">Reset</button>
+        <button type="button" id="diceBtn">🎲 Dés</button>
+        <button type="button" id="undoBtn" disabled>Annuler</button>
+        <button type="button" id="resetBtn">Reset</button>
     </div>
 
-    <div id="show-card-overlay" onclick="closeOverlay()">
-        <svg class="detective-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <div id="show-card-overlay">
+        <svg class="detective-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M56,12V8H52v4H12V8H8v4A24,24,0,0,0,8,60V56h4v4H52V56h4v4a24,24,0,0,0,0-48ZM32,56A20,20,0,1,1,52,36,20,20,0,0,1,32,56Z"/>
             <path d="M28,24a8,8,0,0,1,8,8h4a12,12,0,0,0-12-12Z"/>
             <circle cx="32" cy="36" r="4"/>
@@ -157,139 +38,6 @@
         <div class="hint">Touchez pour fermer</div>
     </div>
 
-    <script>
-        const DATA_KEY = "cluedo_local_v3";
-        const categories = {
-            "Suspects": ["Mlle Rose", "Col. Moutarde", "Mme Pervenche", "Dr Olive", "Mme Leblanc", "Prof. Violet"],
-            "Armes": ["Poignard", "Chandelier", "Revolver", "Corde", "Matraque", "Clé Anglaise"],
-            "Lieux": ["Cuisine", "Salle de bal", "Salon", "Salle à Manger", "Billard", "Bibliothèque", "Bureau", "Hall", "Véranda"]
-        };
-
-        let gameState = JSON.parse(localStorage.getItem(DATA_KEY)) || {};
-        let history = [];
-
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        function playDiceSound() {
-            for(let i=0; i<3; i++) {
-                setTimeout(() => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(150 - (i*20), audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.1);
-                }, i * 150);
-            }
-        }
-
-        function rollDice() {
-            const result = Math.floor(Math.random() * 11) + 2; 
-            playDiceSound();
-            
-            setTimeout(() => {
-                const utterance = new SpeechSynthesisUtterance(result);
-                utterance.lang = 'fr-FR';
-                utterance.rate = 1.1;
-
-                // Tentative de sélection d'une voix masculine
-                const voices = window.speechSynthesis.getVoices();
-                const maleVoice = voices.find(v => 
-                    v.lang.startsWith('fr') && 
-                    (v.name.toLowerCase().includes('thomas') || 
-                     v.name.toLowerCase().includes('paul') || 
-                     v.name.toLowerCase().includes('male'))
-                );
-                
-                if (maleVoice) utterance.voice = maleVoice;
-
-                window.speechSynthesis.speak(utterance);
-            }, 600);
-        }
-
-        // Nécessaire pour charger les voix sur certains navigateurs (Chrome mobile)
-        window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
-
-        function save() {
-            localStorage.setItem(DATA_KEY, JSON.stringify(gameState));
-            document.getElementById('undoBtn').disabled = history.length === 0;
-        }
-
-        function toggleOwned(item) {
-            history.push(JSON.stringify(gameState));
-            const current = gameState[item] || 0;
-            gameState[item] = (current === 2) ? 0 : 2;
-            save();
-            render();
-        }
-
-        function eliminate(item) {
-            history.push(JSON.stringify(gameState));
-            gameState[item] = 1; 
-            save();
-            render();
-        }
-
-        function showCard(item) {
-            document.getElementById('card-display-name').innerText = item;
-            document.getElementById('show-card-overlay').style.display = 'flex';
-        }
-
-        function closeOverlay() {
-            document.getElementById('show-card-overlay').style.display = 'none';
-        }
-
-        function undo() {
-            if (history.length > 0) {
-                gameState = JSON.parse(history.pop());
-                save();
-                render();
-            }
-        }
-
-        function resetGame() {
-            if(confirm("Tout réinitialiser ?")) {
-                history.push(JSON.stringify(gameState));
-                gameState = {};
-                save();
-                render();
-            }
-        }
-
-        function render() {
-            const app = document.getElementById('app');
-            let html = '';
-
-            for (const [category, items] of Object.entries(categories)) {
-                html += `<div class="section-title">${category}</div>`;
-                items.forEach(item => {
-                    const status = gameState[item] || 0;
-                    if (status === 1) return;
-
-                    const safeItem = item.replace(/'/g, "\\'");
-                    const isOwned = status === 2;
-
-                    html += `
-                        <div class="row ${isOwned ? 'owned' : ''}">
-                            <div class="item-name" onclick="toggleOwned('${safeItem}')">
-                                ${isOwned ? '🃏 ' : ''}<span>${item}</span>
-                            </div>
-                            ${isOwned ? 
-                                `<div class="action-btn show-icon" onclick="showCard('${safeItem}')">👁️</div>` : 
-                                `<div class="action-btn delete-icon" onclick="eliminate('${safeItem}')">✖</div>`
-                            }
-                        </div>
-                    `;
-                });
-            }
-            app.innerHTML = html;
-        }
-
-        render();
-    </script>
+    <script src="js/app.js" defer></script>
 </body>
 </html>
