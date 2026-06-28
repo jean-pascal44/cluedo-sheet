@@ -10,7 +10,7 @@ const MODE = { SELECTION: "selection", GAME: "game" };
 const categories = {
     Suspects: ["Mlle Rose", "Col. Moutarde", "Mme Pervenche", "Dr Olive", "Mme Leblanc", "Prof. Violet"],
     Armes: ["Poignard", "Chandelier", "Revolver", "Corde", "Matraque", "Clé Anglaise"],
-    Lieux: ["Cuisine", "Salle de bal", "Salon", "Salle à Manger", "Billard", "Bibliothèque", "Bureau", "Hall", "Véranda"]
+    Lieux: ["Cuisine", "Salle de bal", "Salon", "Salle à manger", "Salle de billard", "Bibliothèque", "Bureau", "Hall", "Véranda"]
 };
 
 const weaponIcons = {
@@ -22,6 +22,18 @@ const weaponIcons = {
     "Clé Anglaise": "pictures/armes/cle-anglaise.svg"
 };
 
+const locationIcons = {
+    "Cuisine": "pictures/lieux/cuisine.svg",
+    "Salle de bal": "pictures/lieux/salle-de-bal.svg",
+    "Salon": "pictures/lieux/salon.svg",
+    "Salle à manger": "pictures/lieux/salle-a-manger.svg",
+    "Salle de billard": "pictures/lieux/salle-de-billard.svg",
+    "Bibliothèque": "pictures/lieux/bibliotheque.svg",
+    "Bureau": "pictures/lieux/bureau.svg",
+    "Hall": "pictures/lieux/hall.svg",
+    "Véranda": "pictures/lieux/veranda.svg"
+};
+
 const shortNames = {
     "Mlle Rose": "Rose",
     "Col. Moutarde": "Moutarde",
@@ -30,8 +42,8 @@ const shortNames = {
     "Mme Leblanc": "Leblanc",
     "Prof. Violet": "Violet",
     "Clé Anglaise": "Clé angl.",
-    "Salle de bal": "S. de bal",
-    "Salle à Manger": "S. à manger"
+    "Salle de bal": "Salle de bal",
+    "Salle à Manger": "Salle à manger"
 };
 
 let gameState = JSON.parse(localStorage.getItem(DATA_KEY)) || {};
@@ -83,8 +95,12 @@ function displayName(item, full = false) {
     return full ? item : (shortNames[item] || item);
 }
 
-function weaponIconHtml(item) {
-    const src = weaponIcons[item];
+function getCardIcon(item) {
+    return weaponIcons[item] || locationIcons[item];
+}
+
+function cardIconHtml(item) {
+    const src = getCardIcon(item);
     if (!src) return "";
     return `<img class="card-tile__icon" src="${src}" alt="" aria-hidden="true">`;
 }
@@ -156,7 +172,7 @@ function validateGame() {
 }
 
 function showCard(item) {
-    const iconSrc = weaponIcons[item];
+    const iconSrc = getCardIcon(item);
     const overlayIcon = document.getElementById("card-display-icon");
     const detectiveSvg = document.querySelector(".detective-svg");
 
@@ -245,7 +261,7 @@ function handleAppClick(event) {
 function renderCardTile(item, status, { inHand = false } = {}) {
     const safeItem = escapeHtml(item);
     const label = escapeHtml(displayName(item, false));
-    const icon = weaponIconHtml(item);
+    const icon = cardIconHtml(item);
     const bodyClass = ["card-tile__body", icon && "card-tile__body--with-icon"].filter(Boolean).join(" ");
     const isSuspect = status === STATUS.SUSPECT;
     const tileClass = ["card-tile", !inHand && status === STATUS.OWNED && "owned", isSuspect && "suspect"].filter(Boolean).join(" ");
