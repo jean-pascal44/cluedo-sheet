@@ -1,4 +1,4 @@
-const CACHE_NAME = "cluedo-sheet-v5";
+const CACHE_NAME = "cluedo-sheet-v6";
 
 const ASSETS = [
     "./",

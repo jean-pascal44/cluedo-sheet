@@ -29,8 +29,17 @@
 <body>
 
     <header class="header">
-        <button type="button" id="themeBtn" aria-label="Changer de thème">🌙</button>
         <h1>CLUEDO</h1>
+        <button type="button" id="menuBtn" class="menu-btn" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="burgerMenu">
+            <span class="menu-btn__bar"></span>
+            <span class="menu-btn__bar"></span>
+            <span class="menu-btn__bar"></span>
+        </button>
+        <nav id="burgerMenu" class="burger-menu" hidden>
+            <button type="button" id="undoBtn" class="burger-menu__item" disabled>Annuler</button>
+            <button type="button" id="resetBtn" class="burger-menu__item">Reset</button>
+            <button type="button" id="themeBtn" class="burger-menu__item">🌙 Mode sombre</button>
+        </nav>
     </header>
 
     <div class="tabs-wrapper">
@@ -51,10 +60,7 @@
         </div>
     </div>
 
-    <div class="controls">
-        <button type="button" id="undoBtn" disabled>Annuler</button>
-        <button type="button" id="resetBtn">Reset</button>
-    </div>
+    <div id="menuBackdrop" class="menu-backdrop" hidden></div>
 
     <div id="show-card-overlay">
         <svg class="detective-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

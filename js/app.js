@@ -89,6 +89,7 @@ function resetGame() {
         gameState = {};
         save();
         render();
+        closeMenu();
     }
 }
 
@@ -222,9 +223,39 @@ function applyTheme(theme) {
 
     const btn = document.getElementById("themeBtn");
     if (btn) {
-        btn.textContent = theme === "dark" ? "☀️" : "🌙";
-        btn.setAttribute("aria-label", theme === "dark" ? "Passer en mode clair" : "Passer en mode sombre");
+        btn.textContent = theme === "dark" ? "☀️ Mode clair" : "🌙 Mode sombre";
     }
+}
+
+function openMenu() {
+    document.getElementById("burgerMenu").hidden = false;
+    document.getElementById("menuBackdrop").hidden = false;
+    document.getElementById("menuBtn").classList.add("is-open");
+    document.getElementById("menuBtn").setAttribute("aria-expanded", "true");
+    document.getElementById("menuBtn").setAttribute("aria-label", "Fermer le menu");
+}
+
+function closeMenu() {
+    document.getElementById("burgerMenu").hidden = true;
+    document.getElementById("menuBackdrop").hidden = true;
+    document.getElementById("menuBtn").classList.remove("is-open");
+    document.getElementById("menuBtn").setAttribute("aria-expanded", "false");
+    document.getElementById("menuBtn").setAttribute("aria-label", "Ouvrir le menu");
+}
+
+function toggleMenu() {
+    const isOpen = !document.getElementById("burgerMenu").hidden;
+    if (isOpen) closeMenu();
+    else openMenu();
+}
+
+function initMenu() {
+    document.getElementById("menuBtn").addEventListener("click", toggleMenu);
+    document.getElementById("menuBackdrop").addEventListener("click", closeMenu);
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeMenu();
+    });
 }
 
 function initTheme() {
@@ -238,14 +269,19 @@ function toggleTheme() {
     const next = current === "dark" ? "light" : "dark";
     localStorage.setItem(THEME_KEY, next);
     applyTheme(next);
+    closeMenu();
 }
 
 function init() {
     initTheme();
     initTabs();
+    initMenu();
 
     document.getElementById("themeBtn").addEventListener("click", toggleTheme);
-    document.getElementById("undoBtn").addEventListener("click", undo);
+    document.getElementById("undoBtn").addEventListener("click", () => {
+        undo();
+        closeMenu();
+    });
     document.getElementById("resetBtn").addEventListener("click", resetGame);
     document.getElementById("show-card-overlay").addEventListener("click", closeOverlay);
     document.getElementById("tabsTrack").addEventListener("click", handleAppClick);
