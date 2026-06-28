@@ -28,8 +28,6 @@ let currentTab = Math.min(Math.max(parseInt(localStorage.getItem(TAB_KEY), 10) |
 let touchStartX = 0;
 let touchStartY = 0;
 
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
 function getStatus(item) {
     return gameState[item] || STATUS.NEUTRAL;
 }
@@ -47,48 +45,6 @@ function escapeHtml(text) {
 function displayName(item, full = false) {
     return full ? item : (shortNames[item] || item);
 }
-
-function playDiceSound() {
-    for (let i = 0; i < 3; i++) {
-        setTimeout(() => {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = "triangle";
-            osc.frequency.setValueAtTime(150 - (i * 20), audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
-        }, i * 150);
-    }
-}
-
-function rollDice() {
-    const result = Math.floor(Math.random() * 11) + 2;
-    playDiceSound();
-
-    setTimeout(() => {
-        const utterance = new SpeechSynthesisUtterance(result);
-        utterance.lang = "fr-FR";
-        utterance.rate = 1.1;
-
-        const voices = window.speechSynthesis.getVoices();
-        const maleVoice = voices.find(v =>
-            v.lang.startsWith("fr") &&
-            (v.name.toLowerCase().includes("thomas") ||
-             v.name.toLowerCase().includes("paul") ||
-             v.name.toLowerCase().includes("male"))
-        );
-
-        if (maleVoice) utterance.voice = maleVoice;
-
-        window.speechSynthesis.speak(utterance);
-    }, 600);
-}
-
-window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
 
 function save() {
     localStorage.setItem(DATA_KEY, JSON.stringify(gameState));
@@ -289,7 +245,6 @@ function init() {
     initTabs();
 
     document.getElementById("themeBtn").addEventListener("click", toggleTheme);
-    document.getElementById("diceBtn").addEventListener("click", rollDice);
     document.getElementById("undoBtn").addEventListener("click", undo);
     document.getElementById("resetBtn").addEventListener("click", resetGame);
     document.getElementById("show-card-overlay").addEventListener("click", closeOverlay);

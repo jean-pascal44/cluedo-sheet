@@ -17,7 +17,6 @@
     --owned-bg: rgba(81, 45, 168, 0.12);
     --owned-text: #4527a0;
     --eye-color: #0277bd;
-    --dice-color: #f57c00;
     --delete-color: #9e9e9e;
     --overlay-bg: #1a1a1a;
     --overlay-text: #ffffff;
@@ -43,7 +42,6 @@
     --owned-bg: rgba(81, 45, 168, 0.4);
     --owned-text: #d1c4e9;
     --eye-color: #4fc3f7;
-    --dice-color: #ffb300;
     --delete-color: #555555;
     --overlay-bg: #000000;
     --overlay-text: #ffffff;
@@ -260,7 +258,6 @@ h1 {
 
 .controls button:disabled { opacity: 0.2; cursor: not-allowed; }
 
-#diceBtn { border-color: var(--dice-color); color: var(--dice-color); font-weight: bold; }
 #undoBtn:not(:disabled) { border-color: var(--eye-color); color: var(--eye-color); }
 
 #show-card-overlay {
