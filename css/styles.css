@@ -360,6 +360,21 @@ body[data-mode="game"] .tab-btn.is-active {
     flex-shrink: 0;
 }
 
+.card-tile__swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px var(--shadow);
+}
+
+.card-tile__swatch--rose { background-color: #f48fb1; }
+.card-tile__swatch--moutarde { background-color: #f9a825; }
+.card-tile__swatch--pervenche { background-color: #1565c0; }
+.card-tile__swatch--olive { background-color: #558b2f; }
+.card-tile__swatch--leblanc { background-color: #f5f5f5; border: 2px solid var(--border); }
+.card-tile__swatch--violet { background-color: #7b1fa2; }
+
 [data-theme="dark"] .card-tile__icon {
     filter: invert(1) brightness(0.9);
 }
@@ -502,6 +517,21 @@ body[data-mode="game"] .tab-btn.is-active {
 
 .detective-svg { width: 150px; height: 150px; fill: var(--detective-icon-color); }
 .card-display-icon { width: 120px; height: 120px; object-fit: contain; }
+.card-display-swatch {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    box-shadow: 0 4px 16px var(--shadow);
+}
+
+.card-display-swatch--rose { background-color: #f48fb1; }
+.card-display-swatch--moutarde { background-color: #f9a825; }
+.card-display-swatch--pervenche { background-color: #1565c0; }
+.card-display-swatch--olive { background-color: #558b2f; }
+.card-display-swatch--leblanc { background-color: #f5f5f5; border: 3px solid var(--border); }
+.card-display-swatch--violet { background-color: #7b1fa2; }
+
 [data-theme="dark"] .card-display-icon { filter: invert(1) brightness(0.9); }
+[data-theme="dark"] .card-display-swatch--leblanc { background-color: #e0e0e0; }
 #show-card-overlay h2 { font-size: 2em; color: var(--overlay-text); text-transform: uppercase; text-align: center; padding: 0 16px; }
 .hint { position: absolute; bottom: 40px; opacity: 0.4; color: var(--overlay-text); }

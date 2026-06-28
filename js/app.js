@@ -34,6 +34,15 @@ const locationIcons = {
     "Véranda": "pictures/lieux/veranda.svg"
 };
 
+const suspectSwatches = {
+    "Mlle Rose": "rose",
+    "Col. Moutarde": "moutarde",
+    "Mme Pervenche": "pervenche",
+    "Dr Olive": "olive",
+    "Mme Leblanc": "leblanc",
+    "Prof. Violet": "violet"
+};
+
 const shortNames = {
     "Mlle Rose": "Rose",
     "Col. Moutarde": "Moutarde",
@@ -99,10 +108,22 @@ function getCardIcon(item) {
     return weaponIcons[item] || locationIcons[item];
 }
 
-function cardIconHtml(item) {
-    const src = getCardIcon(item);
-    if (!src) return "";
-    return `<img class="card-tile__icon" src="${src}" alt="" aria-hidden="true">`;
+function hasCardVisual(item) {
+    return Boolean(getCardIcon(item) || suspectSwatches[item]);
+}
+
+function cardVisualHtml(item) {
+    const iconSrc = getCardIcon(item);
+    if (iconSrc) {
+        return `<img class="card-tile__icon" src="${iconSrc}" alt="" aria-hidden="true">`;
+    }
+
+    const swatch = suspectSwatches[item];
+    if (swatch) {
+        return `<span class="card-tile__swatch card-tile__swatch--${swatch}" aria-hidden="true"></span>`;
+    }
+
+    return "";
 }
 
 function save() {
@@ -173,16 +194,24 @@ function validateGame() {
 
 function showCard(item) {
     const iconSrc = getCardIcon(item);
+    const swatchKey = suspectSwatches[item];
     const overlayIcon = document.getElementById("card-display-icon");
+    const overlaySwatch = document.getElementById("card-display-swatch");
     const detectiveSvg = document.querySelector(".detective-svg");
+
+    overlayIcon.hidden = true;
+    overlaySwatch.hidden = true;
+    overlaySwatch.className = "card-display-swatch";
+    detectiveSvg.hidden = false;
 
     if (iconSrc) {
         overlayIcon.src = iconSrc;
         overlayIcon.hidden = false;
         detectiveSvg.hidden = true;
-    } else {
-        overlayIcon.hidden = true;
-        detectiveSvg.hidden = false;
+    } else if (swatchKey) {
+        overlaySwatch.classList.add(`card-display-swatch--${swatchKey}`);
+        overlaySwatch.hidden = false;
+        detectiveSvg.hidden = true;
     }
 
     document.getElementById("card-display-name").innerText = item;
@@ -261,8 +290,8 @@ function handleAppClick(event) {
 function renderCardTile(item, status, { inHand = false } = {}) {
     const safeItem = escapeHtml(item);
     const label = escapeHtml(displayName(item, false));
-    const icon = cardIconHtml(item);
-    const bodyClass = ["card-tile__body", icon && "card-tile__body--with-icon"].filter(Boolean).join(" ");
+    const visual = cardVisualHtml(item);
+    const bodyClass = ["card-tile__body", hasCardVisual(item) && "card-tile__body--with-icon"].filter(Boolean).join(" ");
     const isSuspect = status === STATUS.SUSPECT;
     const tileClass = ["card-tile", !inHand && status === STATUS.OWNED && "owned", isSuspect && "suspect"].filter(Boolean).join(" ");
 
@@ -270,7 +299,7 @@ function renderCardTile(item, status, { inHand = false } = {}) {
         return `
             <div class="${tileClass}">
                 <div class="${bodyClass}" data-action="show-card" data-item="${safeItem}">
-                    ${icon}
+                    ${visual}
                     <span class="card-tile__label">${label}</span>
                 </div>
             </div>
@@ -281,7 +310,7 @@ function renderCardTile(item, status, { inHand = false } = {}) {
         return `
             <div class="${tileClass}">
                 <div class="${bodyClass}" data-action="toggle-owned" data-item="${safeItem}">
-                    ${icon}
+                    ${visual}
                     <span class="card-tile__label">${label}</span>
                 </div>
             </div>
@@ -292,7 +321,7 @@ function renderCardTile(item, status, { inHand = false } = {}) {
         return `
             <div class="${tileClass}">
                 <div class="${bodyClass}" data-action="toggle-owned" data-item="${safeItem}">
-                    ${icon}
+                    ${visual}
                     <span class="card-tile__label">${label}</span>
                 </div>
             </div>
@@ -303,7 +332,7 @@ function renderCardTile(item, status, { inHand = false } = {}) {
         return `
             <div class="card-tile card-tile--ghost">
                 <div class="${bodyClass}" data-action="restore" data-item="${safeItem}" aria-label="Restaurer ${safeItem}">
-                    ${icon}
+                    ${visual}
                     <span class="card-tile__label">${label}</span>
                 </div>
                 <div class="card-tile__action card-tile__action--ghost" aria-hidden="true">✖</div>
@@ -318,7 +347,7 @@ function renderCardTile(item, status, { inHand = false } = {}) {
     return `
         <div class="${tileClass}">
             <div class="${bodyClass}" data-action="toggle-suspect" data-item="${safeItem}">
-                ${icon}
+                ${visual}
                 ${labelHtml}
             </div>
             <button type="button" class="card-tile__action delete-icon" data-action="eliminate" data-item="${safeItem}" aria-label="Éliminer ${safeItem}">✖</button>
