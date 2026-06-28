@@ -51,7 +51,9 @@ function getStatus(item) {
 }
 
 function isVisibleInCategoryTab(status) {
-    return status !== STATUS.ELIMINATED && status !== STATUS.OWNED;
+    if (status === STATUS.OWNED) return false;
+    if (status === STATUS.ELIMINATED) return isGameMode();
+    return true;
 }
 
 function isSelectionMode() {
@@ -120,6 +122,14 @@ function eliminate(item) {
     if (!isGameMode()) return;
 
     gameState[item] = STATUS.ELIMINATED;
+    save();
+    render();
+}
+
+function restoreCard(item) {
+    if (!isGameMode()) return;
+
+    delete gameState[item];
     save();
     render();
 }
@@ -200,6 +210,7 @@ function handleAppClick(event) {
     if (action === "toggle-owned") toggleOwned(item);
     else if (action === "toggle-suspect") toggleSuspect(item);
     else if (action === "eliminate") eliminate(item);
+    else if (action === "restore") restoreCard(item);
     else if (action === "show-card") showCard(item);
 }
 
@@ -235,6 +246,17 @@ function renderCardTile(item, status, { inHand = false } = {}) {
                 <div class="card-tile__body" data-action="toggle-owned" data-item="${safeItem}">
                     <span class="card-tile__label">${label}</span>
                 </div>
+            </div>
+        `;
+    }
+
+    if (status === STATUS.ELIMINATED) {
+        return `
+            <div class="card-tile card-tile--ghost">
+                <div class="card-tile__body" data-action="restore" data-item="${safeItem}" aria-label="Restaurer ${safeItem}">
+                    <span class="card-tile__label">${label}</span>
+                </div>
+                <div class="card-tile__action card-tile__action--ghost" aria-hidden="true">✖</div>
             </div>
         `;
     }
@@ -285,8 +307,12 @@ function renderHandPanel() {
 }
 
 function renderCategoryPanel(categoryName, emptyMessage) {
-    const visible = categories[categoryName].filter((item) => isVisibleInCategoryTab(getStatus(item)));
-    return renderCardGrid(visible, emptyMessage);
+    const items = categories[categoryName].filter((item) => isVisibleInCategoryTab(getStatus(item)));
+    const active = items.filter((item) => getStatus(item) !== STATUS.ELIMINATED);
+    if (active.length === 0 && items.length === 0) {
+        return `<p class="empty-state">${emptyMessage}</p>`;
+    }
+    return renderCardGrid(items);
 }
 
 function getStoredTheme() {

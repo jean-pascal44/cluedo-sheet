@@ -316,6 +316,17 @@ body[data-mode="game"] .tab-btn.is-active {
     background: var(--suspect-row-bg);
 }
 
+.card-tile--ghost {
+    opacity: 0.4;
+    border-color: transparent;
+    background: transparent;
+}
+
+.card-tile--ghost .card-tile__label {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
 .card-tile__label--suspect {
     display: inline-block;
     padding: 2px 8px;
@@ -356,6 +367,10 @@ body[data-mode="game"] .tab-btn.is-active {
 
 .card-tile__action.delete-icon { color: var(--delete-color); }
 .card-tile__action.show-icon { color: var(--eye-color); }
+.card-tile__action--ghost {
+    visibility: hidden;
+    pointer-events: none;
+}
 
 #show-card-overlay {
     display: none;
