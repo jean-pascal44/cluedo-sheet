@@ -1,4 +1,4 @@
-const CACHE_NAME = "cluedo-sheet-v24";
+const CACHE_NAME = "cluedo-sheet-v27";
 
 const ASSETS = [
     "./",
@@ -8,7 +8,13 @@ const ASSETS = [
     "./manifest.webmanifest",
     "./icons/icon.svg",
     "./icons/icon-192.png",
-    "./icons/icon-512.png"
+    "./icons/icon-512.png",
+    "./pictures/armes/poignard.svg",
+    "./pictures/armes/chandelier.svg",
+    "./pictures/armes/revolver.svg",
+    "./pictures/armes/corde.svg",
+    "./pictures/armes/matraque.svg",
+    "./pictures/armes/cle-anglaise.svg"
 ];
 
 self.addEventListener("install", (event) => {

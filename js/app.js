@@ -13,6 +13,15 @@ const categories = {
     Lieux: ["Cuisine", "Salle de bal", "Salon", "Salle à Manger", "Billard", "Bibliothèque", "Bureau", "Hall", "Véranda"]
 };
 
+const weaponIcons = {
+    "Poignard": "pictures/armes/poignard.svg",
+    "Chandelier": "pictures/armes/chandelier.svg",
+    "Revolver": "pictures/armes/revolver.svg",
+    "Corde": "pictures/armes/corde.svg",
+    "Matraque": "pictures/armes/matraque.svg",
+    "Clé Anglaise": "pictures/armes/cle-anglaise.svg"
+};
+
 const shortNames = {
     "Mlle Rose": "Rose",
     "Col. Moutarde": "Moutarde",
@@ -72,6 +81,12 @@ function escapeHtml(text) {
 
 function displayName(item, full = false) {
     return full ? item : (shortNames[item] || item);
+}
+
+function weaponIconHtml(item) {
+    const src = weaponIcons[item];
+    if (!src) return "";
+    return `<img class="card-tile__icon" src="${src}" alt="" aria-hidden="true">`;
 }
 
 function save() {
@@ -141,6 +156,19 @@ function validateGame() {
 }
 
 function showCard(item) {
+    const iconSrc = weaponIcons[item];
+    const overlayIcon = document.getElementById("card-display-icon");
+    const detectiveSvg = document.querySelector(".detective-svg");
+
+    if (iconSrc) {
+        overlayIcon.src = iconSrc;
+        overlayIcon.hidden = false;
+        detectiveSvg.hidden = true;
+    } else {
+        overlayIcon.hidden = true;
+        detectiveSvg.hidden = false;
+    }
+
     document.getElementById("card-display-name").innerText = item;
     document.getElementById("show-card-overlay").style.display = "flex";
 }
@@ -217,13 +245,16 @@ function handleAppClick(event) {
 function renderCardTile(item, status, { inHand = false } = {}) {
     const safeItem = escapeHtml(item);
     const label = escapeHtml(displayName(item, false));
+    const icon = weaponIconHtml(item);
+    const bodyClass = ["card-tile__body", icon && "card-tile__body--with-icon"].filter(Boolean).join(" ");
     const isSuspect = status === STATUS.SUSPECT;
     const tileClass = ["card-tile", !inHand && status === STATUS.OWNED && "owned", isSuspect && "suspect"].filter(Boolean).join(" ");
 
     if (inHand && isGameMode()) {
         return `
             <div class="${tileClass}">
-                <div class="card-tile__body" data-action="show-card" data-item="${safeItem}">
+                <div class="${bodyClass}" data-action="show-card" data-item="${safeItem}">
+                    ${icon}
                     <span class="card-tile__label">${label}</span>
                 </div>
             </div>
@@ -233,7 +264,8 @@ function renderCardTile(item, status, { inHand = false } = {}) {
     if (inHand && isSelectionMode()) {
         return `
             <div class="${tileClass}">
-                <div class="card-tile__body" data-action="toggle-owned" data-item="${safeItem}">
+                <div class="${bodyClass}" data-action="toggle-owned" data-item="${safeItem}">
+                    ${icon}
                     <span class="card-tile__label">${label}</span>
                 </div>
             </div>
@@ -243,7 +275,8 @@ function renderCardTile(item, status, { inHand = false } = {}) {
     if (isSelectionMode()) {
         return `
             <div class="${tileClass}">
-                <div class="card-tile__body" data-action="toggle-owned" data-item="${safeItem}">
+                <div class="${bodyClass}" data-action="toggle-owned" data-item="${safeItem}">
+                    ${icon}
                     <span class="card-tile__label">${label}</span>
                 </div>
             </div>
@@ -253,7 +286,8 @@ function renderCardTile(item, status, { inHand = false } = {}) {
     if (status === STATUS.ELIMINATED) {
         return `
             <div class="card-tile card-tile--ghost">
-                <div class="card-tile__body" data-action="restore" data-item="${safeItem}" aria-label="Restaurer ${safeItem}">
+                <div class="${bodyClass}" data-action="restore" data-item="${safeItem}" aria-label="Restaurer ${safeItem}">
+                    ${icon}
                     <span class="card-tile__label">${label}</span>
                 </div>
                 <div class="card-tile__action card-tile__action--ghost" aria-hidden="true">✖</div>
@@ -267,7 +301,8 @@ function renderCardTile(item, status, { inHand = false } = {}) {
 
     return `
         <div class="${tileClass}">
-            <div class="card-tile__body" data-action="toggle-suspect" data-item="${safeItem}">
+            <div class="${bodyClass}" data-action="toggle-suspect" data-item="${safeItem}">
+                ${icon}
                 ${labelHtml}
             </div>
             <button type="button" class="card-tile__action delete-icon" data-action="eliminate" data-item="${safeItem}" aria-label="Éliminer ${safeItem}">✖</button>
@@ -350,6 +385,15 @@ function closeMenu() {
     document.getElementById("menuBtn").setAttribute("aria-label", "Ouvrir le menu");
 }
 
+function openAbout() {
+    closeMenu();
+    document.getElementById("about-overlay").hidden = false;
+}
+
+function closeAbout() {
+    document.getElementById("about-overlay").hidden = true;
+}
+
 function toggleMenu() {
     const isOpen = !document.getElementById("burgerMenu").hidden;
     if (isOpen) closeMenu();
@@ -359,9 +403,20 @@ function toggleMenu() {
 function initMenu() {
     document.getElementById("menuBtn").addEventListener("click", toggleMenu);
     document.getElementById("menuBackdrop").addEventListener("click", closeMenu);
+    document.getElementById("aboutBtn").addEventListener("click", openAbout);
+    document.getElementById("aboutCloseBtn").addEventListener("click", closeAbout);
+
+    document.getElementById("about-overlay").addEventListener("click", (event) => {
+        if (event.target.id === "about-overlay") closeAbout();
+    });
 
     document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") closeMenu();
+        if (event.key !== "Escape") return;
+        if (!document.getElementById("about-overlay").hidden) {
+            closeAbout();
+            return;
+        }
+        closeMenu();
     });
 }
 

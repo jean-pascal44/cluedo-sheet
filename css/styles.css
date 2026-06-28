@@ -347,6 +347,23 @@ body[data-mode="game"] .tab-btn.is-active {
     padding: 8px 6px;
 }
 
+.card-tile__body--with-icon {
+    flex-direction: column;
+    gap: 4px;
+    min-height: 56px;
+}
+
+.card-tile__icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+[data-theme="dark"] .card-tile__icon {
+    filter: invert(1) brightness(0.9);
+}
+
 .card-tile__label {
     text-align: center;
     font-size: 0.72em;
@@ -372,6 +389,105 @@ body[data-mode="game"] .tab-btn.is-active {
     pointer-events: none;
 }
 
+.about-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.about-overlay[hidden] {
+    display: none;
+}
+
+.about-dialog {
+    width: 100%;
+    max-width: 380px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px var(--shadow);
+    padding: 20px;
+}
+
+.about-dialog__title {
+    margin: 0 0 12px;
+    font-size: 1.1em;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.about-dialog__app-name {
+    margin: 0 0 8px;
+    font-size: 1.15em;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.about-dialog__section-title {
+    margin: 16px 0 8px;
+    font-size: 0.95em;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.about-dialog__body {
+    font-size: 0.85em;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+.about-dialog__body p {
+    margin: 0 0 8px;
+}
+
+.about-dialog__body a {
+    color: var(--eye-color);
+}
+
+.about-list {
+    margin: 0;
+    padding-left: 1.2em;
+}
+
+.about-list li {
+    margin-bottom: 4px;
+}
+
+.about-list em {
+    font-style: normal;
+    color: var(--text);
+    font-size: 0.92em;
+}
+
+.about-dialog__close {
+    margin-top: 16px;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--btn-border);
+    border-radius: 8px;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.about-dialog__close:hover {
+    background: var(--btn-hover-bg);
+    color: var(--btn-hover-text);
+}
+
 #show-card-overlay {
     display: none;
     position: fixed;
@@ -385,5 +501,7 @@ body[data-mode="game"] .tab-btn.is-active {
 }
 
 .detective-svg { width: 150px; height: 150px; fill: var(--detective-icon-color); }
+.card-display-icon { width: 120px; height: 120px; object-fit: contain; }
+[data-theme="dark"] .card-display-icon { filter: invert(1) brightness(0.9); }
 #show-card-overlay h2 { font-size: 2em; color: var(--overlay-text); text-transform: uppercase; text-align: center; padding: 0 16px; }
 .hint { position: absolute; bottom: 40px; opacity: 0.4; color: var(--overlay-text); }

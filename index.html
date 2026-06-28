@@ -38,6 +38,7 @@
         <nav id="burgerMenu" class="burger-menu" hidden>
             <button type="button" id="resetBtn" class="burger-menu__item">🔄 Nouvelle partie</button>
             <button type="button" id="themeBtn" class="burger-menu__item">🌙 Mode sombre</button>
+            <button type="button" id="aboutBtn" class="burger-menu__item">ℹ️ À propos</button>
         </nav>
     </header>
 
@@ -63,7 +64,31 @@
 
     <button type="button" id="validateBtn" class="validate-fab" aria-label="Commencer la partie">▶</button>
 
+    <div id="about-overlay" class="about-overlay" hidden>
+        <div class="about-dialog" role="dialog" aria-labelledby="about-title" aria-modal="true">
+            <h2 id="about-title" class="about-dialog__title">À propos</h2>
+            <div class="about-dialog__body">
+                <p class="about-dialog__app-name">Cluedo Notes</p>
+                <p>Créateur : <strong>hypo59</strong> avec <a href="https://cursor.com/" target="_blank" rel="noopener noreferrer">Cursor</a></p>
+                <p>Version <strong>1.2.0</strong> — 28/06/2026</p>
+
+                <h3 class="about-dialog__section-title">Crédits</h3>
+                <p>Les icônes d'armes proviennent de <a href="https://game-icons.net/" target="_blank" rel="noopener noreferrer">Game-icons.net</a>, sous licence <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>.</p>
+                <ul class="about-list">
+                    <li>Poignard — <em>plain-dagger</em> par Lorc</li>
+                    <li>Chandelier — <em>unlit-candelabra</em> par Lorc</li>
+                    <li>Revolver — <em>revolver</em> par Delapouite</li>
+                    <li>Corde — <em>rope-coil</em> par Delapouite</li>
+                    <li>Matraque — <em>baton</em> par Skoll</li>
+                    <li>Clé anglaise — <em>monkey-wrench</em> par Delapouite</li>
+                </ul>
+            </div>
+            <button type="button" id="aboutCloseBtn" class="about-dialog__close">Fermer</button>
+        </div>
+    </div>
+
     <div id="show-card-overlay">
+        <img id="card-display-icon" class="card-display-icon" src="" alt="" hidden>
         <svg class="detective-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M56,12V8H52v4H12V8H8v4A24,24,0,0,0,8,60V56h4v4H52V56h4v4a24,24,0,0,0,0-48ZM32,56A20,20,0,1,1,52,36,20,20,0,0,1,32,56Z"/>
             <path d="M28,24a8,8,0,0,1,8,8h4a12,12,0,0,0-12-12Z"/>
