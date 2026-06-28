@@ -36,16 +36,15 @@
             <span class="menu-btn__bar"></span>
         </button>
         <nav id="burgerMenu" class="burger-menu" hidden>
-            <button type="button" id="undoBtn" class="burger-menu__item" disabled>Annuler</button>
-            <button type="button" id="resetBtn" class="burger-menu__item">Reset</button>
+            <button type="button" id="resetBtn" class="burger-menu__item">🔄 Nouvelle partie</button>
             <button type="button" id="themeBtn" class="burger-menu__item">🌙 Mode sombre</button>
         </nav>
     </header>
 
     <div class="tabs-wrapper">
         <nav class="tabs-nav" id="tabsNav" aria-label="Catégories">
-            <button type="button" class="tab-btn is-active" data-tab="0">🃏 Main</button>
-            <button type="button" class="tab-btn" data-tab="1">Suspects</button>
+            <button type="button" class="tab-btn" data-tab="0">Main</button>
+            <button type="button" class="tab-btn is-active" data-tab="1">Suspects</button>
             <button type="button" class="tab-btn" data-tab="2">Armes</button>
             <button type="button" class="tab-btn" data-tab="3">Lieux</button>
         </nav>
@@ -61,6 +60,8 @@
     </div>
 
     <div id="menuBackdrop" class="menu-backdrop" hidden></div>
+
+    <button type="button" id="validateBtn" class="validate-fab" aria-label="Commencer la partie">▶</button>
 
     <div id="show-card-overlay">
         <svg class="detective-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

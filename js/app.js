@@ -1,8 +1,11 @@
 const DATA_KEY = "cluedo_local_v3";
 const THEME_KEY = "cluedo_theme";
 const TAB_KEY = "cluedo_tab";
+const MODE_KEY = "cluedo_mode";
 const TAB_COUNT = 4;
-const STATUS = { NEUTRAL: 0, ELIMINATED: 1, OWNED: 2 };
+const TAB_SUSPECTS = 1;
+const STATUS = { NEUTRAL: 0, ELIMINATED: 1, OWNED: 2, SUSPECT: 3 };
+const MODE = { SELECTION: "selection", GAME: "game" };
 
 const categories = {
     Suspects: ["Mlle Rose", "Col. Moutarde", "Mme Pervenche", "Dr Olive", "Mme Leblanc", "Prof. Violet"],
@@ -23,10 +26,25 @@ const shortNames = {
 };
 
 let gameState = JSON.parse(localStorage.getItem(DATA_KEY)) || {};
-let history = [];
-let currentTab = Math.min(Math.max(parseInt(localStorage.getItem(TAB_KEY), 10) || 0, 0), TAB_COUNT - 1);
+let appMode = getInitialMode();
+let currentTab = getInitialTab();
 let touchStartX = 0;
 let touchStartY = 0;
+
+function getInitialMode() {
+    const stored = localStorage.getItem(MODE_KEY);
+    if (stored === MODE.SELECTION || stored === MODE.GAME) return stored;
+    return Object.keys(gameState).length > 0 ? MODE.GAME : MODE.SELECTION;
+}
+
+function getInitialTab() {
+    const stored = localStorage.getItem(TAB_KEY);
+    if (stored !== null) {
+        const n = parseInt(stored, 10);
+        if (n >= 0 && n < TAB_COUNT) return n;
+    }
+    return appMode === MODE.SELECTION ? TAB_SUSPECTS : 0;
+}
 
 function getStatus(item) {
     return gameState[item] || STATUS.NEUTRAL;
@@ -34,6 +52,14 @@ function getStatus(item) {
 
 function isVisibleInCategoryTab(status) {
     return status !== STATUS.ELIMINATED && status !== STATUS.OWNED;
+}
+
+function isSelectionMode() {
+    return appMode === MODE.SELECTION;
+}
+
+function isGameMode() {
+    return appMode === MODE.GAME;
 }
 
 function escapeHtml(text) {
@@ -48,20 +74,58 @@ function displayName(item, full = false) {
 
 function save() {
     localStorage.setItem(DATA_KEY, JSON.stringify(gameState));
-    document.getElementById("undoBtn").disabled = history.length === 0;
+    localStorage.setItem(MODE_KEY, appMode);
+}
+
+function updateAppMode() {
+    document.body.dataset.mode = appMode;
+    document.getElementById("validateBtn").hidden = !isSelectionMode();
+}
+
+function render() {
+    updateAppMode();
+    document.getElementById("panel-hand").innerHTML = renderHandPanel();
+    document.getElementById("panel-suspects").innerHTML = renderCategoryPanel("Suspects", "Aucun suspect disponible.");
+    document.getElementById("panel-armes").innerHTML = renderCategoryPanel("Armes", "Aucune arme disponible.");
+    document.getElementById("panel-lieux").innerHTML = renderCategoryPanel("Lieux", "Aucun lieu disponible.");
 }
 
 function toggleOwned(item) {
-    history.push(JSON.stringify(gameState));
+    if (!isSelectionMode()) return;
+
     const current = getStatus(item);
-    gameState[item] = current === STATUS.OWNED ? STATUS.NEUTRAL : STATUS.OWNED;
+    if (current === STATUS.OWNED) {
+        delete gameState[item];
+    } else {
+        gameState[item] = STATUS.OWNED;
+    }
+    save();
+    render();
+}
+
+function toggleSuspect(item) {
+    if (!isGameMode()) return;
+
+    const current = getStatus(item);
+    if (current === STATUS.NEUTRAL) {
+        gameState[item] = STATUS.SUSPECT;
+    } else if (current === STATUS.SUSPECT) {
+        delete gameState[item];
+    }
     save();
     render();
 }
 
 function eliminate(item) {
-    history.push(JSON.stringify(gameState));
+    if (!isGameMode()) return;
+
     gameState[item] = STATUS.ELIMINATED;
+    save();
+    render();
+}
+
+function validateGame() {
+    appMode = MODE.GAME;
     save();
     render();
 }
@@ -75,19 +139,12 @@ function closeOverlay() {
     document.getElementById("show-card-overlay").style.display = "none";
 }
 
-function undo() {
-    if (history.length > 0) {
-        gameState = JSON.parse(history.pop());
-        save();
-        render();
-    }
-}
-
 function resetGame() {
     if (confirm("Tout réinitialiser ?")) {
-        history.push(JSON.stringify(gameState));
         gameState = {};
+        appMode = MODE.SELECTION;
         save();
+        goToTab(TAB_SUSPECTS);
         render();
         closeMenu();
     }
@@ -141,26 +198,57 @@ function handleAppClick(event) {
 
     const { action, item } = target.dataset;
     if (action === "toggle-owned") toggleOwned(item);
+    else if (action === "toggle-suspect") toggleSuspect(item);
     else if (action === "eliminate") eliminate(item);
     else if (action === "show-card") showCard(item);
 }
 
 function renderCardTile(item, status, { inHand = false } = {}) {
     const safeItem = escapeHtml(item);
-    const label = escapeHtml(displayName(item, inHand));
-    const isOwned = status === STATUS.OWNED;
-    const tileClass = ["card-tile", isOwned && "owned"].filter(Boolean).join(" ");
+    const label = escapeHtml(displayName(item, false));
+    const isSuspect = status === STATUS.SUSPECT;
+    const tileClass = ["card-tile", !inHand && status === STATUS.OWNED && "owned", isSuspect && "suspect"].filter(Boolean).join(" ");
+
+    if (inHand && isGameMode()) {
+        return `
+            <div class="${tileClass}">
+                <div class="card-tile__body" data-action="show-card" data-item="${safeItem}">
+                    <span class="card-tile__label">${label}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    if (inHand && isSelectionMode()) {
+        return `
+            <div class="${tileClass}">
+                <div class="card-tile__body" data-action="toggle-owned" data-item="${safeItem}">
+                    <span class="card-tile__label">${label}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    if (isSelectionMode()) {
+        return `
+            <div class="${tileClass}">
+                <div class="card-tile__body" data-action="toggle-owned" data-item="${safeItem}">
+                    <span class="card-tile__label">${label}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    const labelHtml = isSuspect
+        ? `<span class="card-tile__label card-tile__label--suspect">${label}</span>`
+        : `<span class="card-tile__label">${label}</span>`;
 
     return `
         <div class="${tileClass}">
-            <div class="card-tile__body" data-action="toggle-owned" data-item="${safeItem}">
-                <span class="card-tile__label">${isOwned ? "🃏 " : ""}${label}</span>
+            <div class="card-tile__body" data-action="toggle-suspect" data-item="${safeItem}">
+                ${labelHtml}
             </div>
-            ${
-                inHand
-                    ? `<button type="button" class="card-tile__action show-icon" data-action="show-card" data-item="${safeItem}" aria-label="Montrer ${safeItem}">👁️</button>`
-                    : `<button type="button" class="card-tile__action delete-icon" data-action="eliminate" data-item="${safeItem}" aria-label="Éliminer ${safeItem}">✖</button>`
-            }
+            <button type="button" class="card-tile__action delete-icon" data-action="eliminate" data-item="${safeItem}" aria-label="Éliminer ${safeItem}">✖</button>
         </div>
     `;
 }
@@ -189,23 +277,16 @@ function renderHandPanel() {
         }
     }
 
-    return renderCardGrid(
-        owned,
-        "Aucune carte en main.<br>Appuyez sur une carte dans les autres onglets pour la marquer 🃏",
-        { inHand: true }
-    );
+    const emptyMessage = isSelectionMode()
+        ? "Aucune carte en main.<br>Appuyez sur une carte dans les onglets pour la sélectionner 🃏"
+        : "Aucune carte en main.";
+
+    return renderCardGrid(owned, emptyMessage, { inHand: true });
 }
 
 function renderCategoryPanel(categoryName, emptyMessage) {
     const visible = categories[categoryName].filter((item) => isVisibleInCategoryTab(getStatus(item)));
     return renderCardGrid(visible, emptyMessage);
-}
-
-function render() {
-    document.getElementById("panel-hand").innerHTML = renderHandPanel();
-    document.getElementById("panel-suspects").innerHTML = renderCategoryPanel("Suspects", "Aucun suspect disponible.");
-    document.getElementById("panel-armes").innerHTML = renderCategoryPanel("Armes", "Aucune arme disponible.");
-    document.getElementById("panel-lieux").innerHTML = renderCategoryPanel("Lieux", "Aucun lieu disponible.");
 }
 
 function getStoredTheme() {
@@ -278,10 +359,7 @@ function init() {
     initMenu();
 
     document.getElementById("themeBtn").addEventListener("click", toggleTheme);
-    document.getElementById("undoBtn").addEventListener("click", () => {
-        undo();
-        closeMenu();
-    });
+    document.getElementById("validateBtn").addEventListener("click", validateGame);
     document.getElementById("resetBtn").addEventListener("click", resetGame);
     document.getElementById("show-card-overlay").addEventListener("click", closeOverlay);
     document.getElementById("tabsTrack").addEventListener("click", handleAppClick);
