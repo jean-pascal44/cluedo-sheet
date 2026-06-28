@@ -33,16 +33,32 @@
         <h1>CLUEDO</h1>
     </header>
 
-    <div id="app" class="grid-container"></div>
+    <div class="tabs-wrapper">
+        <nav class="tabs-nav" id="tabsNav" aria-label="Catégories">
+            <button type="button" class="tab-btn is-active" data-tab="0">🃏 Main</button>
+            <button type="button" class="tab-btn" data-tab="1">Suspects</button>
+            <button type="button" class="tab-btn" data-tab="2">Armes</button>
+            <button type="button" class="tab-btn" data-tab="3">Lieux</button>
+        </nav>
 
-    <div class="controls">
-        <button id="diceBtn" onclick="rollDice()">🎲 Dés</button>
-        <button id="undoBtn" onclick="undo()" disabled>Annuler</button>
-        <button onclick="resetGame()">Reset</button>
+        <div class="tabs-viewport" id="tabsViewport">
+            <div class="tabs-track" id="tabsTrack">
+                <section class="tab-panel" id="panel-hand" aria-label="Mes cartes en main"></section>
+                <section class="tab-panel" id="panel-suspects" aria-label="Suspects"></section>
+                <section class="tab-panel" id="panel-armes" aria-label="Armes"></section>
+                <section class="tab-panel" id="panel-lieux" aria-label="Lieux"></section>
+            </div>
+        </div>
     </div>
 
-    <div id="show-card-overlay" onclick="closeOverlay()">
-        <svg class="detective-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <div class="controls">
+        <button type="button" id="diceBtn">🎲 Dés</button>
+        <button type="button" id="undoBtn" disabled>Annuler</button>
+        <button type="button" id="resetBtn">Reset</button>
+    </div>
+
+    <div id="show-card-overlay">
+        <svg class="detective-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M56,12V8H52v4H12V8H8v4A24,24,0,0,0,8,60V56h4v4H52V56h4v4a24,24,0,0,0,0-48ZM32,56A20,20,0,1,1,52,36,20,20,0,0,1,32,56Z"/>
             <path d="M28,24a8,8,0,0,1,8,8h4a12,12,0,0,0-12-12Z"/>
             <circle cx="32" cy="36" r="4"/>

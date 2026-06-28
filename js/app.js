@@ -1,22 +1,59 @@
 const DATA_KEY = "cluedo_local_v3";
 const THEME_KEY = "cluedo_theme";
+const TAB_KEY = "cluedo_tab";
+const TAB_COUNT = 4;
+const STATUS = { NEUTRAL: 0, ELIMINATED: 1, OWNED: 2 };
+
 const categories = {
-    "Suspects": ["Mlle Rose", "Col. Moutarde", "Mme Pervenche", "Dr Olive", "Mme Leblanc", "Prof. Violet"],
-    "Armes": ["Poignard", "Chandelier", "Revolver", "Corde", "Matraque", "Clé Anglaise"],
-    "Lieux": ["Cuisine", "Salle de bal", "Salon", "Salle à Manger", "Billard", "Bibliothèque", "Bureau", "Hall", "Véranda"]
+    Suspects: ["Mlle Rose", "Col. Moutarde", "Mme Pervenche", "Dr Olive", "Mme Leblanc", "Prof. Violet"],
+    Armes: ["Poignard", "Chandelier", "Revolver", "Corde", "Matraque", "Clé Anglaise"],
+    Lieux: ["Cuisine", "Salle de bal", "Salon", "Salle à Manger", "Billard", "Bibliothèque", "Bureau", "Hall", "Véranda"]
+};
+
+const shortNames = {
+    "Mlle Rose": "Rose",
+    "Col. Moutarde": "Moutarde",
+    "Mme Pervenche": "Pervenche",
+    "Dr Olive": "Olive",
+    "Mme Leblanc": "Leblanc",
+    "Prof. Violet": "Violet",
+    "Clé Anglaise": "Clé angl.",
+    "Salle de bal": "S. de bal",
+    "Salle à Manger": "S. à manger"
 };
 
 let gameState = JSON.parse(localStorage.getItem(DATA_KEY)) || {};
 let history = [];
+let currentTab = Math.min(Math.max(parseInt(localStorage.getItem(TAB_KEY), 10) || 0, 0), TAB_COUNT - 1);
+let touchStartX = 0;
+let touchStartY = 0;
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function getStatus(item) {
+    return gameState[item] || STATUS.NEUTRAL;
+}
+
+function isVisibleInCategoryTab(status) {
+    return status !== STATUS.ELIMINATED && status !== STATUS.OWNED;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function displayName(item, full = false) {
+    return full ? item : (shortNames[item] || item);
+}
 
 function playDiceSound() {
     for (let i = 0; i < 3; i++) {
         setTimeout(() => {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.type = 'triangle';
+            osc.type = "triangle";
             osc.frequency.setValueAtTime(150 - (i * 20), audioCtx.currentTime);
             gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
@@ -34,15 +71,15 @@ function rollDice() {
 
     setTimeout(() => {
         const utterance = new SpeechSynthesisUtterance(result);
-        utterance.lang = 'fr-FR';
+        utterance.lang = "fr-FR";
         utterance.rate = 1.1;
 
         const voices = window.speechSynthesis.getVoices();
         const maleVoice = voices.find(v =>
-            v.lang.startsWith('fr') &&
-            (v.name.toLowerCase().includes('thomas') ||
-             v.name.toLowerCase().includes('paul') ||
-             v.name.toLowerCase().includes('male'))
+            v.lang.startsWith("fr") &&
+            (v.name.toLowerCase().includes("thomas") ||
+             v.name.toLowerCase().includes("paul") ||
+             v.name.toLowerCase().includes("male"))
         );
 
         if (maleVoice) utterance.voice = maleVoice;
@@ -55,31 +92,31 @@ window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoice
 
 function save() {
     localStorage.setItem(DATA_KEY, JSON.stringify(gameState));
-    document.getElementById('undoBtn').disabled = history.length === 0;
+    document.getElementById("undoBtn").disabled = history.length === 0;
 }
 
 function toggleOwned(item) {
     history.push(JSON.stringify(gameState));
-    const current = gameState[item] || 0;
-    gameState[item] = (current === 2) ? 0 : 2;
+    const current = getStatus(item);
+    gameState[item] = current === STATUS.OWNED ? STATUS.NEUTRAL : STATUS.OWNED;
     save();
     render();
 }
 
 function eliminate(item) {
     history.push(JSON.stringify(gameState));
-    gameState[item] = 1;
+    gameState[item] = STATUS.ELIMINATED;
     save();
     render();
 }
 
 function showCard(item) {
-    document.getElementById('card-display-name').innerText = item;
-    document.getElementById('show-card-overlay').style.display = 'flex';
+    document.getElementById("card-display-name").innerText = item;
+    document.getElementById("show-card-overlay").style.display = "flex";
 }
 
 function closeOverlay() {
-    document.getElementById('show-card-overlay').style.display = 'none';
+    document.getElementById("show-card-overlay").style.display = "none";
 }
 
 function undo() {
@@ -99,33 +136,119 @@ function resetGame() {
     }
 }
 
-function render() {
-    const app = document.getElementById('app');
-    let html = '';
+function goToTab(index, persist = true) {
+    currentTab = Math.max(0, Math.min(TAB_COUNT - 1, index));
+    document.getElementById("tabsTrack").style.transform = `translateX(-${currentTab * 100}%)`;
 
-    for (const [category, items] of Object.entries(categories)) {
-        html += `<div class="section-title">${category}</div>`;
-        items.forEach(item => {
-            const status = gameState[item] || 0;
-            if (status === 1) return;
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.classList.toggle("is-active", parseInt(btn.dataset.tab, 10) === currentTab);
+    });
 
-            const safeItem = item.replace(/'/g, "\\'");
-            const isOwned = status === 2;
-
-            html += `
-                <div class="row ${isOwned ? 'owned' : ''}">
-                    <div class="item-name" onclick="toggleOwned('${safeItem}')">
-                        ${isOwned ? '🃏 ' : ''}<span>${item}</span>
-                    </div>
-                    ${isOwned ?
-                        `<div class="action-btn show-icon" onclick="showCard('${safeItem}')">👁️</div>` :
-                        `<div class="action-btn delete-icon" onclick="eliminate('${safeItem}')">✖</div>`
-                    }
-                </div>
-            `;
-        });
+    if (persist) {
+        localStorage.setItem(TAB_KEY, String(currentTab));
     }
-    app.innerHTML = html;
+}
+
+function initTabs() {
+    const viewport = document.getElementById("tabsViewport");
+
+    document.getElementById("tabsNav").addEventListener("click", (event) => {
+        const btn = event.target.closest(".tab-btn");
+        if (!btn) return;
+        goToTab(parseInt(btn.dataset.tab, 10));
+    });
+
+    viewport.addEventListener("touchstart", (event) => {
+        touchStartX = event.touches[0].clientX;
+        touchStartY = event.touches[0].clientY;
+    }, { passive: true });
+
+    viewport.addEventListener("touchend", (event) => {
+        const touch = event.changedTouches[0];
+        const deltaX = touch.clientX - touchStartX;
+        const deltaY = touch.clientY - touchStartY;
+
+        if (Math.abs(deltaX) < 50 || Math.abs(deltaX) < Math.abs(deltaY)) return;
+
+        goToTab(currentTab + (deltaX < 0 ? 1 : -1));
+    }, { passive: true });
+
+    goToTab(currentTab, false);
+}
+
+function handleAppClick(event) {
+    const target = event.target.closest("[data-action]");
+    if (!target) return;
+
+    event.stopPropagation();
+
+    const { action, item } = target.dataset;
+    if (action === "toggle-owned") toggleOwned(item);
+    else if (action === "eliminate") eliminate(item);
+    else if (action === "show-card") showCard(item);
+}
+
+function renderCardTile(item, status, { inHand = false } = {}) {
+    const safeItem = escapeHtml(item);
+    const label = escapeHtml(displayName(item, inHand));
+    const isOwned = status === STATUS.OWNED;
+    const tileClass = ["card-tile", isOwned && "owned"].filter(Boolean).join(" ");
+
+    return `
+        <div class="${tileClass}">
+            <div class="card-tile__body" data-action="toggle-owned" data-item="${safeItem}">
+                <span class="card-tile__label">${isOwned ? "🃏 " : ""}${label}</span>
+            </div>
+            ${
+                inHand
+                    ? `<button type="button" class="card-tile__action show-icon" data-action="show-card" data-item="${safeItem}" aria-label="Montrer ${safeItem}">👁️</button>`
+                    : `<button type="button" class="card-tile__action delete-icon" data-action="eliminate" data-item="${safeItem}" aria-label="Éliminer ${safeItem}">✖</button>`
+            }
+        </div>
+    `;
+}
+
+function renderCardGrid(items, emptyMessage, options = {}) {
+    if (items.length === 0) {
+        return `<p class="empty-state">${emptyMessage}</p>`;
+    }
+
+    let html = '<div class="card-grid">';
+    items.forEach((item) => {
+        html += renderCardTile(item, getStatus(item), options);
+    });
+    html += "</div>";
+    return html;
+}
+
+function renderHandPanel() {
+    const owned = [];
+
+    for (const items of Object.values(categories)) {
+        for (const item of items) {
+            if (getStatus(item) === STATUS.OWNED) {
+                owned.push(item);
+            }
+        }
+    }
+
+    return renderCardGrid(
+        owned,
+        "Aucune carte en main.<br>Appuyez sur une carte dans les autres onglets pour la marquer 🃏",
+        { inHand: true }
+    );
+}
+
+function renderCategoryPanel(categoryName, emptyMessage) {
+    const visible = categories[categoryName].filter((item) => isVisibleInCategoryTab(getStatus(item)));
+    return renderCardGrid(visible, emptyMessage);
+}
+
+function render() {
+    document.getElementById("panel-hand").innerHTML = renderHandPanel();
+    document.getElementById("panel-suspects").innerHTML = renderCategoryPanel("Suspects", "Aucun suspect disponible.");
+    document.getElementById("panel-armes").innerHTML = renderCategoryPanel("Armes", "Aucune arme disponible.");
+    document.getElementById("panel-lieux").innerHTML = renderCategoryPanel("Lieux", "Aucun lieu disponible.");
 }
 
 function getStoredTheme() {
@@ -161,13 +284,25 @@ function toggleTheme() {
     applyTheme(next);
 }
 
-initTheme();
-document.getElementById("themeBtn").addEventListener("click", toggleTheme);
+function init() {
+    initTheme();
+    initTabs();
 
-render();
+    document.getElementById("themeBtn").addEventListener("click", toggleTheme);
+    document.getElementById("diceBtn").addEventListener("click", rollDice);
+    document.getElementById("undoBtn").addEventListener("click", undo);
+    document.getElementById("resetBtn").addEventListener("click", resetGame);
+    document.getElementById("show-card-overlay").addEventListener("click", closeOverlay);
+    document.getElementById("tabsTrack").addEventListener("click", handleAppClick);
+
+    render();
+    save();
+}
 
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker.register("./sw.js");
     });
 }
+
+init();
