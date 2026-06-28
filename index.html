@@ -13,11 +13,25 @@
     <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
     <link rel="stylesheet" href="css/styles.css">
+    <script>
+        (function () {
+            var t = localStorage.getItem("cluedo_theme");
+            if (t === "light" || t === "dark") {
+                document.documentElement.setAttribute("data-theme", t);
+            } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                document.documentElement.setAttribute("data-theme", "dark");
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+            }
+        })();
+    </script>
 </head>
 <body>
 
-    <h1>CLUEDO</h1>
-    <p class="subtitle">🃏 main | ✖ éliminer | 👁️ montrer</p>
+    <header class="header">
+        <button type="button" id="themeBtn" aria-label="Changer de thème">🌙</button>
+        <h1>CLUEDO</h1>
+    </header>
 
     <div id="app" class="grid-container"></div>
 

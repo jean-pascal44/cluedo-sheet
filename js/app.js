@@ -1,4 +1,5 @@
 const DATA_KEY = "cluedo_local_v3";
+const THEME_KEY = "cluedo_theme";
 const categories = {
     "Suspects": ["Mlle Rose", "Col. Moutarde", "Mme Pervenche", "Dr Olive", "Mme Leblanc", "Prof. Violet"],
     "Armes": ["Poignard", "Chandelier", "Revolver", "Corde", "Matraque", "Clé Anglaise"],
@@ -126,6 +127,42 @@ function render() {
     }
     app.innerHTML = html;
 }
+
+function getStoredTheme() {
+    const stored = localStorage.getItem(THEME_KEY);
+    return stored === "light" || stored === "dark" ? stored : null;
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+        meta.content = theme === "dark" ? "#1a1a1a" : "#f0f2f5";
+    }
+
+    const btn = document.getElementById("themeBtn");
+    if (btn) {
+        btn.textContent = theme === "dark" ? "☀️" : "🌙";
+        btn.setAttribute("aria-label", theme === "dark" ? "Passer en mode clair" : "Passer en mode sombre");
+    }
+}
+
+function initTheme() {
+    const stored = getStoredTheme();
+    const theme = stored ?? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    applyTheme(theme);
+}
+
+function toggleTheme() {
+    const current = document.documentElement.getAttribute("data-theme");
+    const next = current === "dark" ? "light" : "dark";
+    localStorage.setItem(THEME_KEY, next);
+    applyTheme(next);
+}
+
+initTheme();
+document.getElementById("themeBtn").addEventListener("click", toggleTheme);
 
 render();
 
