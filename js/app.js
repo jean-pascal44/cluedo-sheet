@@ -13,6 +13,8 @@ const categories = {
     Lieux: ["Cuisine", "Salle de bal", "Salon", "Salle à manger", "Salle de billard", "Bibliothèque", "Bureau", "Hall", "Véranda"]
 };
 
+const coloredCardIcons = new Set(["Chandelier", "Poignard", "Revolver", "Corde", "Clé Anglaise", "Matraque"]);
+
 const weaponIcons = {
     "Poignard": "pictures/armes/poignard.svg",
     "Chandelier": "pictures/armes/chandelier.svg",
@@ -108,6 +110,10 @@ function getCardIcon(item) {
     return weaponIcons[item] || locationIcons[item];
 }
 
+function cardIconUsesNativeColors(item) {
+    return coloredCardIcons.has(item);
+}
+
 function hasCardVisual(item) {
     return Boolean(getCardIcon(item) || suspectSwatches[item]);
 }
@@ -115,7 +121,8 @@ function hasCardVisual(item) {
 function cardVisualHtml(item) {
     const iconSrc = getCardIcon(item);
     if (iconSrc) {
-        return `<img class="card-tile__icon" src="${iconSrc}" alt="" aria-hidden="true">`;
+        const nativeClass = cardIconUsesNativeColors(item) ? " card-icon--native-colors" : "";
+        return `<img class="card-tile__icon${nativeClass}" src="${iconSrc}" alt="" aria-hidden="true">`;
     }
 
     const swatch = suspectSwatches[item];
@@ -206,6 +213,7 @@ function showCard(item) {
 
     if (iconSrc) {
         overlayIcon.src = iconSrc;
+        overlayIcon.classList.toggle("card-icon--native-colors", cardIconUsesNativeColors(item));
         overlayIcon.hidden = false;
         detectiveSvg.hidden = true;
     } else if (swatchKey) {
