@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Feuille de notes Cluedo — éliminez et marquez vos cartes.">
+    <meta name="description" content="Cluelog — le journal de votre enquête Cluedo. Éliminez et marquez vos cartes.">
     <meta name="theme-color" content="#1a1a1a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Cluedo Notes">
-    <title>Cluedo Notes</title>
+    <meta name="apple-mobile-web-app-title" content="Cluelog">
+    <title>Cluelog</title>
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -29,7 +29,10 @@
 <body>
 
     <header class="header">
-        <h1>CLUEDO</h1>
+        <div class="brand">
+            <h1 class="brand__title">Clue<span class="brand__log">log</span></h1>
+            <p class="brand__subtitle">Le journal de votre enquête Cluedo</p>
+        </div>
         <button type="button" id="menuBtn" class="menu-btn" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="burgerMenu">
             <span class="menu-btn__bar"></span>
             <span class="menu-btn__bar"></span>
@@ -68,7 +71,7 @@
         <div class="about-dialog" role="dialog" aria-labelledby="about-title" aria-modal="true">
             <h2 id="about-title" class="about-dialog__title">À propos</h2>
             <div class="about-dialog__body">
-                <p class="about-dialog__app-name">Cluedo Notes</p>
+                <p class="about-dialog__app-name">Cluelog</p>
                 <p>Créateur : <strong>hypo59</strong> avec <a href="https://cursor.com/" target="_blank" rel="noopener noreferrer">Cursor</a></p>
                 <p>Version <strong>1.2.0</strong> — 28/06/2026</p>
 

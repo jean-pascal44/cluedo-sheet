@@ -176,12 +176,35 @@ body {
     display: none;
 }
 
-h1 {
+.brand {
+    text-align: center;
+    padding-right: 48px;
+}
+
+.brand__title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 2rem;
+    font-weight: 700;
     color: var(--accent);
     margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    text-align: center;
+    letter-spacing: 0.08em;
+    line-height: 1.1;
+}
+
+.brand__log {
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+}
+
+.brand__subtitle {
+    margin: 6px 0 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.78rem;
+    font-style: italic;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    line-height: 1.35;
 }
 
 .validate-fab {

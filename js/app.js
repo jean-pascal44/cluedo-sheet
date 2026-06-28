@@ -13,7 +13,7 @@ const categories = {
     Lieux: ["Cuisine", "Salle de bal", "Salon", "Salle à manger", "Salle de billard", "Bibliothèque", "Bureau", "Hall", "Véranda"]
 };
 
-const coloredCardIcons = new Set(["Chandelier", "Poignard", "Revolver", "Corde", "Clé Anglaise", "Matraque"]);
+const coloredCardIcons = new Set([...categories.Armes, ...categories.Lieux]);
 
 const weaponIcons = {
     "Poignard": "pictures/armes/poignard.svg",

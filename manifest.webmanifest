@@ -1,7 +1,7 @@
 {
-    "name": "Cluedo Notes",
-    "short_name": "Cluedo",
-    "description": "Feuille de notes pour parties de Cluedo — éliminez et marquez vos cartes.",
+    "name": "Cluelog",
+    "short_name": "Cluelog",
+    "description": "Le journal de votre enquête Cluedo — éliminez et marquez vos cartes.",
     "lang": "fr",
     "start_url": "./",
     "scope": "./",

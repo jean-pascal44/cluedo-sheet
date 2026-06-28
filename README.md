@@ -1,6 +1,8 @@
-# Cluedo Notes
+# Cluelog
 
-Feuille de notes numérique pour accompagner une partie de **Cluedo** (Clue). Application web légère, pensée pour le mobile, qui remplace la feuille papier : vous y enregistrez vos cartes en main, éliminez les possibilités et marquez vos suspects au fil de l'enquête.
+*Le journal de votre enquête Cluedo*
+
+Application web légère pour accompagner une partie de **Cluedo** (Clue). Pensée pour le mobile, elle remplace la feuille papier : vous y enregistrez vos cartes en main, éliminez les possibilités et marquez vos suspects au fil de l'enquête.
 
 **Version actuelle : 1.2.0** (28 juin 2026)
 
